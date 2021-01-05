@@ -1,12 +1,20 @@
 import random
+import tkinter as tk
+import threading
+import guessingMachine.timer as timer
+
 class GuessingMachine():
     def __init__(self):
         self.questionNumList = random.sample(range(10), 4)
         self.roundCount = 0
         self.well_done = False
         self.history_input = []
-        self.ranking = []
-        self.time = 0
+        self.leaderboard = []
+        # self.timeString = tk.StringVar()
+
+        self.stopFlag = threading.Event()
+        self.thread = timer.MyThread(self.stopFlag)
+        # self.thread.set_time_string(timeString)
 
     def click_run(self, userInput):
         # check input format
@@ -83,10 +91,21 @@ class GuessingMachine():
         self.time = t
 
     def ranking_check(self):
-        return  True
+        return True
 
     def ranking(self, userName):
-        print("hi")
+        self.leaderboard.append([userName, self.thread.get_time()])
+
+    def set_time_string(self, time_string):
+        # self.timeString = timeString
+        self.thread.set_time_string(time_string)
+
+    def get_stop_flag(self):
+        return self.stopFlag
+
+    def get_thread(self):
+        return self.thread
+
 
 
 

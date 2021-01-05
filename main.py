@@ -50,12 +50,18 @@ def create_leaderboard_input_window():
     userName = tk.StringVar()
     tk.Label(f, text="congratulations! You are qualified to enter the leaderboard!").grid(row=0, column=1)
     tk.Entry(f, width=20, textvariable=userName).grid(row=1, column=1)
-    tk.Button(f, text="Enter", command=partial(gm.ranking, userName))
+    tk.Button(f, text="Enter", command=lambda: [
+        partial(gm.ranking, userName),
+        ranking_input_window.destroy(),
+        create_end_window()
+    ]).grid(row=2, column=1)
+    f.pack()
+    ranking_input_window.mainloop()
 # ======================================================
 # ======================================================
 # ======================================================
 
-gm = guessingMachine.GuessingMachine()
+
 
 # ======================================================
 # layout ===============================================
@@ -64,10 +70,13 @@ top = tk.Tk()
 top.title("number guessing")
 f1 = tk.Frame(top)
 
-timeString = tk.StringVar()
+gm = guessingMachine.GuessingMachine()
+
+time_string = tk.StringVar()
+gm.set_time_string(time_string)
 userInput = tk.StringVar()
 
-timeLabel = tk.Label(f1, textvariable=timeString).grid(row=0, column=1)
+timeLabel = tk.Label(f1, textvariable=time_string).grid(row=0, column=1)
 welcomeLabel = tk.Label(f1, text="Welcome to Number Game~").grid(row=1, column=1)
 userInputBox = tk.Entry(f1, width=20, textvariable=userInput)
 userInputBox.grid(row=2, column=1)
@@ -92,10 +101,8 @@ f1.pack()
 # ======================================================
 # ======================================================
 # ======================================================
-stopFlag = threading.Event()
-thread = timer.MyThread(stopFlag)
-thread.reset_time()
-thread.set_time_string(timeString)
+stopFlag = gm.get_stop_flag()
+thread = gm.get_thread()
 thread.start()
 
 top.mainloop()
