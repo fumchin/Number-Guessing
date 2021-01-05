@@ -1,8 +1,6 @@
 import tkinter as tk
-import threading
-import random
-import string
 import guessingMachine.machine as guessingMachine
+import pandas as pd
 import guessingMachine.timer as timer
 from functools import partial
 
@@ -14,6 +12,7 @@ def new_game():
     outputBox.delete('1.0', "end")
     userInputBox.delete(0, "end")
     gm.new_game()
+    runButton['state'] = tk.NORMAL
     thread.restart()
 
 def finished_or_not():
@@ -22,6 +21,8 @@ def finished_or_not():
     if gm.get_status():
         # already finished, open new window
         thread.pause()
+        # disable button
+        runButton['state'] = tk.DISABLED
         if gm.ranking_check():
             # input your name
             create_leaderboard_input_window()
@@ -30,6 +31,7 @@ def finished_or_not():
     elif gm.get_round_count() >= 10:
         outputBox.insert("end", "You lose!! Answer: " + gm.get_ans() + "\n")
         thread.pause()
+        runButton['state'] = tk.DISABLED
         create_end_window()
 
 def exit():
@@ -39,8 +41,9 @@ def exit():
 def create_end_window():
     end_window = tk.Toplevel(top)
     f = tk.Frame(end_window)
-    tk.Button(f, text="New Game", command=lambda: [new_game(), end_window.destroy()]).grid(row=0, column=1)
-    tk.Button(f, text="exit", command=exit).grid(row=1, column=1)
+    tk.Button(f, text="Leaderboard", command=show_leaderboard).grid(row=0, column=1)
+    tk.Button(f, text="New Game", command=lambda: [new_game(), end_window.destroy()]).grid(row=1, column=1)
+    tk.Button(f, text="exit", command=exit).grid(row=2, column=1)
     f.pack()
     end_window.mainloop()
 
@@ -51,12 +54,26 @@ def create_leaderboard_input_window():
     tk.Label(f, text="congratulations! You are qualified to enter the leaderboard!").grid(row=0, column=1)
     tk.Entry(f, width=20, textvariable=userName).grid(row=1, column=1)
     tk.Button(f, text="Enter", command=lambda: [
-        partial(gm.ranking, userName),
+        gm.ranking(userName.get()),
         ranking_input_window.destroy(),
         create_end_window()
     ]).grid(row=2, column=1)
     f.pack()
     ranking_input_window.mainloop()
+
+def show_leaderboard():
+    # leaderboardDF
+    leaderboard_window = tk.Toplevel(top)
+    f = tk.Frame(leaderboard_window)
+    record = tk.StringVar()
+    record.set(gm.get_leaderboard())
+    # tk.Label(f, textvariable=record).grid(row=0, column=1)
+    leaderboard_output_box = tk.Text(f)
+    leaderboard_output_box.grid(row=0, column=1)
+    leaderboard_output_box.insert("end", record.get())
+    tk.Button(f, text="Close", command=lambda: [leaderboard_window.destroy()]).grid(row=1,column=1)
+    f.pack()
+    leaderboard_window.mainloop()
 # ======================================================
 # ======================================================
 # ======================================================
@@ -85,7 +102,8 @@ outputBox = tk.Text(f1)
 outputBox.grid(row=4, column=1)
 
 # submit answer
-runButton = tk.Button(f1, text="RUN", command=finished_or_not).grid(row=3, column=1)
+runButton = tk.Button(f1, text="RUN", command=finished_or_not)
+runButton.grid(row=3, column=1)
 
 # show answer
 showAnsButton = tk.Button(f1, text="Show Answer", command=lambda: (
@@ -95,7 +113,10 @@ showAnsButton = tk.Button(f1, text="Show Answer", command=lambda: (
 # new game
 newGameButton = tk.Button(f1, text="New Game", command=new_game).grid(row=6, column=1)
 
-exitButton = tk.Button(f1, text="exit", command=exit).grid(row=7, column=1)
+# show leaderboard
+leaderboardButton = tk.Button(f1, text="leaderboard", command=show_leaderboard).grid(row=7,column=1)
+
+exitButton = tk.Button(f1, text="exit", command=exit).grid(row=8, column=1)
 
 f1.pack()
 # ======================================================

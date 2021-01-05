@@ -2,19 +2,22 @@ import random
 import tkinter as tk
 import threading
 import guessingMachine.timer as timer
+import guessingMachine.leaderboard as GamerInfo
+import pandas as pd
+from operator import itemgetter, attrgetter
 
-class GuessingMachine():
+
+class GuessingMachine:
     def __init__(self):
         self.questionNumList = random.sample(range(10), 4)
         self.roundCount = 0
         self.well_done = False
         self.history_input = []
-        self.leaderboard = []
-        # self.timeString = tk.StringVar()
+        self.leaderboardList = []
 
         self.stopFlag = threading.Event()
         self.thread = timer.MyThread(self.stopFlag)
-        # self.thread.set_time_string(timeString)
+        self.leaderboardDF = pd.DataFrame(columns=["Name", "Rounds", "Time", "Total Sec"])
 
     def click_run(self, userInput):
         # check input format
@@ -91,13 +94,32 @@ class GuessingMachine():
         self.time = t
 
     def ranking_check(self):
-        return True
+        qualify = False
+        if len(self.leaderboardList) < 10:
+            return True
+        else:
+            for ls in self.leaderboardList:
+                if self.roundCount < ls.get_rounds:
+                    qualify = True
+                elif self.roundCount == ls.get_rounds:
+                    if self.thread.get_total_sec() < ls.get_total_sec:
+                        qualify = True
+        return qualify
 
     def ranking(self, userName):
-        self.leaderboard.append([userName, self.thread.get_time()])
+        self.leaderboardList.append(GamerInfo.GamerInfo(userName, self.roundCount, self.thread.get_time(), self.thread.get_total_sec()))
+        self.leaderboardList = sorted(self.leaderboardList, key=attrgetter('rounds', 'total_sec'))
+        if len(self.leaderboardList) > 10:
+            del self.leaderboardList[-1]
+        print(self.leaderboardList)
+
+    def get_leaderboard(self):
+        record = ""
+        for ls in self.leaderboardList:
+            record += ls.get_record()
+        return record
 
     def set_time_string(self, time_string):
-        # self.timeString = timeString
         self.thread.set_time_string(time_string)
 
     def get_stop_flag(self):

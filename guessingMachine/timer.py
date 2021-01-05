@@ -11,6 +11,7 @@ class MyThread(threading.Thread):
         self.duration_min = 0
         self.duration_sec_string = "00"
         self.duration_min_string = "00"
+        self.total_sec = 0
         self.run_or_not = True
 
     def run(self):
@@ -52,3 +53,7 @@ class MyThread(threading.Thread):
     # return string
     def get_time(self):
         return self.duration_min_string + ":" + self.duration_sec_string
+
+    def get_total_sec(self):
+        self.total_sec = 60 * self.duration_min + self.duration_sec
+        return self.total_sec
