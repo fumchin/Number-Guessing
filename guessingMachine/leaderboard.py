@@ -1,6 +1,4 @@
 
-
-
 class GamerInfo:
     def __init__(self, name, rounds, time, total_sec):
         self.name = name

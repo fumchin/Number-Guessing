@@ -1,8 +1,5 @@
 import tkinter as tk
 import guessingMachine.machine as guessingMachine
-import pandas as pd
-import guessingMachine.timer as timer
-from functools import partial
 
 # ======================================================
 # button function ======================================

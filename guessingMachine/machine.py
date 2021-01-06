@@ -1,10 +1,8 @@
 import random
-import tkinter as tk
 import threading
 import guessingMachine.timer as timer
 import guessingMachine.leaderboard as GamerInfo
-import pandas as pd
-from operator import itemgetter, attrgetter
+from operator import attrgetter
 
 
 class GuessingMachine:
@@ -17,7 +15,6 @@ class GuessingMachine:
 
         self.stopFlag = threading.Event()
         self.thread = timer.MyThread(self.stopFlag)
-        self.leaderboardDF = pd.DataFrame(columns=["Name", "Rounds", "Time", "Total Sec"])
 
     def click_run(self, userInput):
         # check input format
@@ -29,7 +26,6 @@ class GuessingMachine:
             self.roundCount += 1
             result = self.judge(userInput)
             return "round" + str(self.roundCount) + " " + userInput + " " + result + "\n"
-
 
     def check_input_format(self, userInput):
         result = ""
