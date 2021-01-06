@@ -12,6 +12,7 @@ class GuessingMachine:
         self.well_done = False
         self.history_input = []
         self.leaderboardList = []
+        self.rank_num = 10
 
         self.stopFlag = threading.Event()
         self.thread = timer.MyThread(self.stopFlag)
@@ -75,6 +76,7 @@ class GuessingMachine:
         self.questionNumList = random.sample(range(10), 4)
         self.roundCount = 0
         self.well_done = False
+        self.history_input.clear()
 
     def get_ans(self):
         s = [str(i) for i in self.questionNumList]
@@ -91,21 +93,21 @@ class GuessingMachine:
 
     def ranking_check(self):
         qualify = False
-        if len(self.leaderboardList) < 10:
+        if len(self.leaderboardList) < self.rank_num:
             return True
         else:
             for ls in self.leaderboardList:
-                if self.roundCount < ls.get_rounds:
+                if self.roundCount < ls.get_rounds():
                     qualify = True
-                elif self.roundCount == ls.get_rounds:
-                    if self.thread.get_total_sec() < ls.get_total_sec:
+                elif self.roundCount == ls.get_rounds():
+                    if self.thread.get_total_sec() < ls.get_total_sec():
                         qualify = True
         return qualify
 
     def ranking(self, userName):
         self.leaderboardList.append(GamerInfo.GamerInfo(userName, self.roundCount, self.thread.get_time(), self.thread.get_total_sec()))
         self.leaderboardList = sorted(self.leaderboardList, key=attrgetter('rounds', 'total_sec'))
-        if len(self.leaderboardList) > 10:
+        if len(self.leaderboardList) > self.rank_num:
             del self.leaderboardList[-1]
         # print(self.leaderboardList)
 
