@@ -47,14 +47,14 @@ class GuessingMachine:
             result += (userInput + " Invalid input!! (character error) Try again!!\n")
             repeat_check = False
 
-        # if repeat_check:
-        #     store_or_not = True
-        #     for item in self.history_input:
-        #         if item == userInput:
-        #             result = userInput + " You've guess this number before!! Try again!!\n"
-        #             store_or_not = False
-        #     if store_or_not:
-        #         self.history_input.append(userInput)
+        if repeat_check:
+            store_or_not = True
+            for item in self.history_input:
+                if item == userInput:
+                    result = userInput + " You've guess this number before!! Try again!!\n"
+                    store_or_not = False
+            if store_or_not:
+                self.history_input.append(userInput)
 
         return result
 
@@ -111,12 +111,12 @@ class GuessingMachine:
         self.leaderboardList = sorted(self.leaderboardList, key=attrgetter('rounds', 'total_sec'))
         if len(self.leaderboardList) > 10:
             del self.leaderboardList[-1]
-        print(self.leaderboardList)
+        # print(self.leaderboardList)
 
     def get_leaderboard(self):
-        record = ""
-        for ls in self.leaderboardList:
-            record += ls.get_record()
+        record = "Rank\tName\tRounds\tTime\n"
+        for i, ls in enumerate(self.leaderboardList):
+            record += (str(i+1) + "\t" + ls.get_record())
         return record
 
     def set_time_string(self, time_string):

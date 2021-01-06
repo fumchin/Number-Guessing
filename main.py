@@ -17,6 +17,7 @@ def new_game():
 
 def finished_or_not():
     result = gm.click_run(userInput.get())
+    userInputBox.delete(0, "end")
     outputBox.insert("end", result)
     if gm.get_status():
         # already finished, open new window
@@ -40,6 +41,7 @@ def exit():
 
 def create_end_window():
     end_window = tk.Toplevel(top)
+    end_window.title("next?")
     f = tk.Frame(end_window)
     tk.Button(f, text="Leaderboard", command=show_leaderboard).grid(row=0, column=1)
     tk.Button(f, text="New Game", command=lambda: [new_game(), end_window.destroy()]).grid(row=1, column=1)
@@ -64,13 +66,14 @@ def create_leaderboard_input_window():
 def show_leaderboard():
     # leaderboardDF
     leaderboard_window = tk.Toplevel(top)
+    leaderboard_window.title("Leaderboard")
     f = tk.Frame(leaderboard_window)
     record = tk.StringVar()
     record.set(gm.get_leaderboard())
-    # tk.Label(f, textvariable=record).grid(row=0, column=1)
     leaderboard_output_box = tk.Text(f)
     leaderboard_output_box.grid(row=0, column=1)
     leaderboard_output_box.insert("end", record.get())
+    leaderboard_output_box['state'] = tk.DISABLED
     tk.Button(f, text="Close", command=lambda: [leaderboard_window.destroy()]).grid(row=1,column=1)
     f.pack()
     leaderboard_window.mainloop()
