@@ -2,6 +2,7 @@
 import tkinter as tk
 import threading
 
+
 class MyThread(threading.Thread):
     def __init__(self, event):
         threading.Thread.__init__(self)
@@ -12,8 +13,9 @@ class MyThread(threading.Thread):
         self.duration_sec_string = "00"
         self.duration_min_string = "00"
         self.total_sec = 0
-        self.run_or_not = True
+        self.run_or_not = True  # if the game is pause, set this to False to stop the time counter
 
+    # repeat every one second, second += 1
     def run(self):
         while not self.stopped.wait(1):
             self.time_string.set("time: " + self.duration_min_string + ":" + self.duration_sec_string)
@@ -24,6 +26,7 @@ class MyThread(threading.Thread):
                     self.duration_min += 1
                 self.output_string_format()
 
+    # return the time in XX:XX format
     def output_string_format(self):
         if self.duration_min >= 10:
             self.duration_min_string = str(self.duration_min)
@@ -50,7 +53,7 @@ class MyThread(threading.Thread):
         self.duration_sec = 0
         self.duration_min = 0
 
-    # return string
+    # return time as string
     def get_time(self):
         return self.duration_min_string + ":" + self.duration_sec_string
 

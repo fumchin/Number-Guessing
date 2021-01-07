@@ -4,16 +4,20 @@ import guessingMachine.machine as guessingMachine
 # ======================================================
 # button function ======================================
 # ======================================================
-
+# new game button
+# 清除output的東西，並通知machine重新設定
 def new_game():
     outputBox.delete('1.0', "end")
     userInputBox.delete(0, "end")
     gm.new_game()
     runButton['state'] = tk.NORMAL
-    thread.restart()
 
-def finished_or_not():
-    result = gm.click_run(userInput.get())
+# 判斷此次送出的輸入結果為何
+# 1. 成功答對，再判斷是否在前十名
+# 2. 答錯，繼續下次猜測
+# 3. 作答超過10次，失敗
+def run_button_pressed():
+    result = gm.input_submit(userInput.get())
     userInputBox.delete(0, "end")
     outputBox.insert("end", result)
     if gm.get_status():
@@ -31,11 +35,13 @@ def finished_or_not():
         thread.pause()
         runButton['state'] = tk.DISABLED
         create_end_window()
-        
+
+# 跳出程式
 def exit():
     stopFlag.set()
     top.destroy()
 
+# 結束遊戲時的視窗，詢問new game, view leaderboard or exit
 def create_end_window():
     end_window = tk.Toplevel(top)
     end_window.title("next?")
@@ -46,6 +52,7 @@ def create_end_window():
     f.pack()
     end_window.mainloop()
 
+# 若玩家成績在前十名，則邀請玩家輸入名字登上排行榜
 def create_leaderboard_input_window():
     ranking_input_window = tk.Toplevel(top)
     f = tk.Frame(ranking_input_window)
@@ -60,6 +67,7 @@ def create_leaderboard_input_window():
     f.pack()
     ranking_input_window.mainloop()
 
+# get leaderboard data from machine and display
 def show_leaderboard():
     # leaderboardDF
     leaderboard_window = tk.Toplevel(top)
@@ -87,8 +95,11 @@ top = tk.Tk()
 top.title("number guessing")
 f1 = tk.Frame(top)
 
+# declare a new guessing machine
 gm = guessingMachine.GuessingMachine()
 
+# pass time_string to the timer in machine
+# update every one second and display it
 time_string = tk.StringVar()
 gm.set_time_string(time_string)
 userInput = tk.StringVar()
@@ -102,7 +113,7 @@ outputBox = tk.Text(f1)
 outputBox.grid(row=4, column=1)
 
 # submit answer
-runButton = tk.Button(f1, text="RUN", command=finished_or_not)
+runButton = tk.Button(f1, text="RUN", command=run_button_pressed)
 runButton.grid(row=3, column=1)
 
 # show answer
@@ -122,6 +133,8 @@ f1.pack()
 # ======================================================
 # ======================================================
 # ======================================================
+
+# build thread and stop flag, starting to timing
 stopFlag = gm.get_stop_flag()
 thread = gm.get_thread()
 thread.start()

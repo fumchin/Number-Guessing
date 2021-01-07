@@ -1,4 +1,4 @@
-
+# this is how we store player info
 class GamerInfo:
     def __init__(self, name, rounds, time, total_sec):
         self.name = name
