@@ -31,7 +31,7 @@ def finished_or_not():
         thread.pause()
         runButton['state'] = tk.DISABLED
         create_end_window()
-
+        
 def exit():
     stopFlag.set()
     top.destroy()
